@@ -125,6 +125,10 @@ it("fences late Discord STT through the model-selected plugin instance", async (
   ) {
     const normalized = Array.isArray(args[0]) ? args[0] : args;
     const options = asOptionalRecord(normalized[0]);
+    // The broker's local IPC is not an outbound TCP destination.
+    if (typeof options?.path === "string" && options.port === undefined) {
+      return Reflect.apply(originalConnect, this, args);
+    }
     const host = options?.host ?? normalized[1];
     const port = Number(options?.port ?? normalized[0]);
     // startGatewayWithClient publishes its allocated port before opening its WS client.
